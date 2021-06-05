@@ -14,12 +14,12 @@ const (
 
 var center = registry{
 	registrars: make([]Registrar, 0),
-	mutex: new(sync.Mutex),
+	mutex:      new(sync.Mutex),
 }
 
-type Service struct {}
+type Service struct{}
 
-func (s Service) ServeHTTP(w http.ResponseWriter, r *http.Request)  {
+func (s Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println("Request received")
 
 	switch r.Method {
@@ -49,7 +49,7 @@ func (s Service) ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 
 type registry struct {
 	registrars []Registrar
-	mutex *sync.Mutex
+	mutex      *sync.Mutex
 }
 
 func (rs *registry) add(registrar Registrar) error {

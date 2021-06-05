@@ -24,11 +24,11 @@ func (fl fileLogger) Write(data []byte) (n int, err error) {
 	return file.Write(data)
 }
 
-func Run(destination string)  {
+func Run(destination string) {
 	logger = log.New(fileLogger(destination), "logger: ", log.LstdFlags)
 }
 
-func RegisterHandlers()  {
+func RegisterHandlers() {
 	http.HandleFunc("/log", func(writer http.ResponseWriter, request *http.Request) {
 		switch request.Method {
 		case http.MethodPost:
@@ -46,6 +46,6 @@ func RegisterHandlers()  {
 	})
 }
 
-func write(data []byte)  {
+func write(data []byte) {
 	logger.Printf("%v\n", string(data))
 }

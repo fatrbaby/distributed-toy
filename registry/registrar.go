@@ -2,7 +2,7 @@ package registry
 
 type Registrar struct {
 	Name ServiceName
-	URL string
+	URL  string
 }
 
 type ServiceName string
