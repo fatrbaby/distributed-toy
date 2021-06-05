@@ -23,7 +23,7 @@ func RegisterService(r Registrar) error {
 		return err
 	}
 
-	if response.StatusCode != http.StatusOK  {
+	if response.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to register service, responded with code: %v", response.StatusCode)
 	}
 
@@ -45,7 +45,7 @@ func ShutdownService(url string) error {
 		return err
 	}
 
-	if response.StatusCode != http.StatusOK  {
+	if response.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to register service, responded with code: %v", response.StatusCode)
 	}
 

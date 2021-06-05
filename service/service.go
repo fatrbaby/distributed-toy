@@ -15,7 +15,7 @@ func Start(ctx context.Context, name, host, port string, handlerRegistrar func()
 
 	registrar := registry.Registrar{
 		Name: serviceName,
-		URL: fmt.Sprintf("http://%s:%s", host, port),
+		URL:  fmt.Sprintf("http://%s:%s", host, port),
 	}
 
 	ctx = startServices(ctx, serviceName, host, port)

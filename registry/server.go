@@ -80,7 +80,7 @@ func (rs *registry) add(registrar Registrar) error {
 	return nil
 }
 
-func (rs *registry) remove(url string) error  {
+func (rs *registry) remove(url string) error {
 	for i, r := range rs.registrars {
 		if r.URL == url {
 			rs.mutex.Lock()
