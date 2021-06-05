@@ -2,6 +2,8 @@ package registry
 
 import (
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"sync"
@@ -9,7 +11,7 @@ import (
 
 const (
 	ServerPort = ":4600"
-	ServersURL = "localhost" + ServerPort + "/services"
+	ServersURL = "http://localhost" + ServerPort + "/services"
 )
 
 var center = registry{
@@ -41,6 +43,24 @@ func (s Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+	case http.MethodDelete:
+		payload, err := ioutil.ReadAll(r.Body)
+
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		url := string(payload)
+		log.Printf("Removing service at URL: %s", url)
+		err = center.remove(url)
+
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -58,4 +78,17 @@ func (rs *registry) add(registrar Registrar) error {
 	rs.mutex.Unlock()
 
 	return nil
+}
+
+func (rs *registry) remove(url string) error  {
+	for i, r := range rs.registrars {
+		if r.URL == url {
+			rs.mutex.Lock()
+			rs.registrars = append(rs.registrars[:i], rs.registrars[:i+1]...)
+			rs.mutex.Unlock()
+			return nil
+		}
+	}
+
+	return fmt.Errorf("service at URL: %s not found", url)
 }
