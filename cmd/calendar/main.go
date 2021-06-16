@@ -14,8 +14,8 @@ func main() {
 	host := "http://localhost:7700"
 
 	registrar := registry.Registrar{
-		Name: registry.ServiceCalendar,
-		URL: host,
+		Name:             registry.ServiceCalendar,
+		URL:              host,
 		RequiredServices: []registry.ServiceName{registry.ServiceLogging},
 		ServiceUpdateURL: fmt.Sprintf("%s/services", host),
 	}
@@ -37,5 +37,3 @@ func main() {
 
 	fmt.Println("shutdown services")
 }
-
-

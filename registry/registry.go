@@ -34,7 +34,7 @@ func (rs *registry) remove(url string) error {
 	return fmt.Errorf("service at URL: %s not found", url)
 }
 
-func (rs *registry) sendRequiredServices(registrar Registrar) error  {
+func (rs *registry) sendRequiredServices(registrar Registrar) error {
 	rs.mutex.RLock()
 	defer rs.mutex.RUnlock()
 
@@ -44,7 +44,7 @@ func (rs *registry) sendRequiredServices(registrar Registrar) error  {
 		if r.Name == registrar.Name {
 			p.Added = append(p.Added, patchEntry{
 				Name: r.Name,
-				URL: r.ServiceUpdateURL,
+				URL:  r.ServiceUpdateURL,
 			})
 		}
 	}
@@ -67,5 +67,3 @@ func (rs *registry) sendPatch(p patch, url string) error {
 
 	return nil
 }
-
-

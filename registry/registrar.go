@@ -11,10 +11,10 @@ type ServiceName string
 
 type patchEntry struct {
 	Name ServiceName
-	URL string
+	URL  string
 }
 
 type patch struct {
-	Added []patchEntry `json:"added"`
+	Added   []patchEntry `json:"added"`
 	Removed []patchEntry `json:"removed"`
 }

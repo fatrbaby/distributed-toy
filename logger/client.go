@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func SetLogger(serviceURL string, clientService registry.ServiceName)  {
+func SetLogger(serviceURL string, clientService registry.ServiceName) {
 	log.SetPrefix(fmt.Sprintf("[%v]", clientService))
 	log.SetFlags(0)
 	log.SetOutput(&clientLogger{
@@ -35,4 +35,3 @@ func (c clientLogger) Write(p []byte) (n int, err error) {
 
 	return len(p), nil
 }
-

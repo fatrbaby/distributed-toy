@@ -15,8 +15,8 @@ func main() {
 	url := "http://localhost:4700"
 
 	registrar := registry.Registrar{
-		Name: registry.ServiceLogging,
-		URL: url,
+		Name:             registry.ServiceLogging,
+		URL:              url,
 		RequiredServices: make([]registry.ServiceName, 0),
 		ServiceUpdateURL: fmt.Sprintf("%s/services", url),
 	}

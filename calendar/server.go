@@ -12,7 +12,7 @@ const (
 	key = "01de3c7b6fadebfba692e57891d87b45"
 )
 
-func RegisterHandler()  {
+func RegisterHandler() {
 	http.HandleFunc("/lunar", func(writer http.ResponseWriter, request *http.Request) {
 		if request.Method != http.MethodGet {
 			writer.WriteHeader(http.StatusMethodNotAllowed)

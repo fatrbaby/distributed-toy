@@ -12,21 +12,21 @@ import (
 )
 
 const (
-	ServiceLogging = ServiceName("service.logging")
+	ServiceLogging  = ServiceName("service.logging")
 	ServiceCalendar = ServiceName("service.calendar")
 )
 
 var prov = providers{
 	services: make(map[ServiceName][]string),
-	mutex: new(sync.RWMutex),
+	mutex:    new(sync.RWMutex),
 }
 
 type providers struct {
 	services map[ServiceName][]string
-	mutex *sync.RWMutex
+	mutex    *sync.RWMutex
 }
 
-func (prov *providers) Update(p patch)  {
+func (prov *providers) Update(p patch) {
 	prov.mutex.Lock()
 	defer prov.mutex.Unlock()
 
@@ -40,7 +40,7 @@ func (prov *providers) Update(p patch)  {
 
 	for _, entry := range p.Removed {
 		if urls, ok := prov.services[entry.Name]; ok {
-			for i, url := range urls{
+			for i, url := range urls {
 				if url == entry.URL {
 					prov.services[entry.Name] = append(urls[:i], urls[:i+1]...)
 				}
@@ -49,11 +49,11 @@ func (prov *providers) Update(p patch)  {
 	}
 }
 
-func GetProvider(name ServiceName) (string, error)  {
+func GetProvider(name ServiceName) (string, error) {
 	return prov.get(name)
 }
 
-func (prov *providers)get(name ServiceName) (string, error) {
+func (prov *providers) get(name ServiceName) (string, error) {
 	services, ok := prov.services[name]
 
 	if !ok {
@@ -118,9 +118,9 @@ func ShutdownService(url string) error {
 	return nil
 }
 
-type serviceUpdateHandler struct {}
+type serviceUpdateHandler struct{}
 
-func (s serviceUpdateHandler)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
+func (s serviceUpdateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
