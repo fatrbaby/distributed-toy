@@ -25,7 +25,7 @@ func (fl fileLogger) Write(data []byte) (n int, err error) {
 }
 
 func Run(destination string) {
-	logger = log.New(fileLogger(destination), "logger: ", log.LstdFlags)
+	logger = log.New(fileLogger(destination), "toy: ", log.LstdFlags)
 }
 
 func RegisterHandlers() {

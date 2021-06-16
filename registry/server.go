@@ -2,7 +2,6 @@ package registry
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -16,7 +15,7 @@ const (
 
 var center = registry{
 	registrars: make([]Registrar, 0),
-	mutex:      new(sync.Mutex),
+	mutex:      new(sync.RWMutex),
 }
 
 type Service struct{}
@@ -65,30 +64,4 @@ func (s Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-}
-
-type registry struct {
-	registrars []Registrar
-	mutex      *sync.Mutex
-}
-
-func (rs *registry) add(registrar Registrar) error {
-	rs.mutex.Lock()
-	rs.registrars = append(rs.registrars, registrar)
-	rs.mutex.Unlock()
-
-	return nil
-}
-
-func (rs *registry) remove(url string) error {
-	for i, r := range rs.registrars {
-		if r.URL == url {
-			rs.mutex.Lock()
-			rs.registrars = append(rs.registrars[:i], rs.registrars[:i+1]...)
-			rs.mutex.Unlock()
-			return nil
-		}
-	}
-
-	return fmt.Errorf("service at URL: %s not found", url)
 }
