@@ -26,23 +26,23 @@ type providers struct {
 	mutex    *sync.RWMutex
 }
 
-func (prov *providers) Update(p patch) {
-	prov.mutex.Lock()
-	defer prov.mutex.Unlock()
+func (that *providers) Update(p patch) {
+	that.mutex.Lock()
+	defer that.mutex.Unlock()
 
 	for _, entry := range p.Added {
-		if _, ok := prov.services[entry.Name]; !ok {
-			prov.services[entry.Name] = make([]string, 0)
+		if _, ok := that.services[entry.Name]; !ok {
+			that.services[entry.Name] = make([]string, 0)
 		}
 
-		prov.services[entry.Name] = append(prov.services[entry.Name], entry.URL)
+		that.services[entry.Name] = append(that.services[entry.Name], entry.URL)
 	}
 
 	for _, entry := range p.Removed {
-		if urls, ok := prov.services[entry.Name]; ok {
-			for i, url := range urls {
-				if url == entry.URL {
-					prov.services[entry.Name] = append(urls[:i], urls[:i+1]...)
+		if urls, ok := that.services[entry.Name]; ok {
+			for i := range urls {
+				if urls[i] == entry.URL {
+					that.services[entry.Name] = append(urls[:i], urls[:i+1]...)
 				}
 			}
 		}
@@ -53,8 +53,8 @@ func GetProvider(name ServiceName) (string, error) {
 	return prov.get(name)
 }
 
-func (prov *providers) get(name ServiceName) (string, error) {
-	services, ok := prov.services[name]
+func (that *providers) get(name ServiceName) (string, error) {
+	services, ok := that.services[name]
 
 	if !ok {
 		return "", fmt.Errorf("no provider available for service %v", name)
@@ -72,7 +72,7 @@ func RegisterService(r Registrar) error {
 		return err
 	}
 
-	http.Handle(updateURL.Path, serviceUpdateHandler{})
+	http.Handle(updateURL.Path, &serviceUpdateHandler{})
 
 	buff := new(bytes.Buffer)
 	encoder := json.NewEncoder(buff)

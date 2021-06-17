@@ -17,7 +17,7 @@ func main() {
 		Name:             registry.ServiceCalendar,
 		URL:              host,
 		RequiredServices: []registry.ServiceName{registry.ServiceLogging},
-		ServiceUpdateURL: fmt.Sprintf("%s/services", host),
+		ServiceUpdateURL: host + "/services",
 	}
 
 	ctx, err := service.Start(context.Background(), registrar, calendar.RegisterHandler)
@@ -26,11 +26,13 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	if prov, err := registry.GetProvider("log.service"); err == nil {
-		fmt.Printf("Logging service found at: %s\n", prov)
-		logger.SetLogger(prov, registrar.Name)
-	} else {
+	prov, err := registry.GetProvider(registry.ServiceLogging)
+
+	if err != nil {
 		fmt.Println(err)
+	} else {
+		fmt.Printf("Logging service found at: %s\n", prov)
+		logger.UseClientLogger(prov, registrar.Name)
 	}
 
 	<-ctx.Done()

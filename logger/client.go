@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func SetLogger(serviceURL string, clientService registry.ServiceName) {
+func UseClientLogger(serviceURL string, clientService registry.ServiceName) {
 	log.SetPrefix(fmt.Sprintf("[%v]", clientService))
 	log.SetFlags(0)
 	log.SetOutput(&clientLogger{

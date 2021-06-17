@@ -41,15 +41,17 @@ func (rs *registry) sendRequiredServices(registrar Registrar) error {
 	var p patch
 
 	for _, r := range rs.registrars {
-		if r.Name == registrar.Name {
-			p.Added = append(p.Added, patchEntry{
-				Name: r.Name,
-				URL:  r.ServiceUpdateURL,
-			})
+		for _, registered := range registrar.RequiredServices {
+			if registered == r.Name {
+				p.Added = append(p.Added, patchEntry{
+					Name: r.Name,
+					URL:  r.ServiceUpdateURL,
+				})
+			}
 		}
 	}
 
-	return rs.sendPatch(p, registrar.URL)
+	return rs.sendPatch(p, registrar.ServiceUpdateURL)
 }
 
 func (rs *registry) sendPatch(p patch, url string) error {

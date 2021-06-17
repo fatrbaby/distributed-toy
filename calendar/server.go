@@ -20,8 +20,11 @@ func RegisterHandler() {
 		}
 
 		query := request.URL.Query()
+		date := query.Get("date")
 
-		response, err := http.Get(fmt.Sprintf("%s?key=%s&date=%s", api, key, query.Get("date")))
+		log.Printf("accept date: %s\n", date)
+
+		response, err := http.Get(fmt.Sprintf("%s?key=%s&date=%s", api, key, date))
 
 		if err != nil {
 			log.Println(err)
