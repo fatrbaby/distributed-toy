@@ -14,11 +14,11 @@ func main() {
 
 	url := "http://localhost:4700"
 
-	registrar := registry.Registrar{
+	registrar := registry.Service{
 		Name:             registry.ServiceLogging,
 		URL:              url,
 		RequiredServices: make([]registry.ServiceName, 0),
-		ServiceUpdateURL: fmt.Sprintf("%s/services", url),
+		UpdateURL:        fmt.Sprintf("%s/services", url),
 	}
 
 	ctx, err := service.Start(context.Background(), registrar, logger.RegisterHandlers)

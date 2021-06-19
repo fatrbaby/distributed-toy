@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	http.Handle("/services", registry.Service{})
+	http.Handle("/services", registry.Server{})
 
 	ctx, cancel := context.WithCancel(context.Background())
 	var srv http.Server

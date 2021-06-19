@@ -9,7 +9,7 @@ import (
 	"net/url"
 )
 
-func Start(ctx context.Context, registrar registry.Registrar, handlerRegistrar func()) (context.Context, error) {
+func Start(ctx context.Context, registrar registry.Service, handlerRegistrar func()) (context.Context, error) {
 	handlerRegistrar()
 
 	ctx = startServices(ctx, registrar)
@@ -22,7 +22,7 @@ func Start(ctx context.Context, registrar registry.Registrar, handlerRegistrar f
 	return ctx, nil
 }
 
-func startServices(ctx context.Context, registrar registry.Registrar) context.Context {
+func startServices(ctx context.Context, registrar registry.Service) context.Context {
 	ctx, cancel := context.WithCancel(ctx)
 
 	var srv http.Server

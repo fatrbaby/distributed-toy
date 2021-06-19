@@ -13,11 +13,11 @@ import (
 func main() {
 	host := "http://localhost:7700"
 
-	registrar := registry.Registrar{
+	registrar := registry.Service{
 		Name:             registry.ServiceCalendar,
 		URL:              host,
 		RequiredServices: []registry.ServiceName{registry.ServiceLogging},
-		ServiceUpdateURL: host + "/services",
+		UpdateURL:        host + "/services",
 	}
 
 	ctx, err := service.Start(context.Background(), registrar, calendar.RegisterHandler)

@@ -9,24 +9,42 @@ import (
 )
 
 type registry struct {
-	registrars []Registrar
-	mutex      *sync.RWMutex
+	services []Service
+	mutex    *sync.RWMutex
 }
 
-func (rs *registry) add(registrar Registrar) error {
-	rs.mutex.Lock()
-	rs.registrars = append(rs.registrars, registrar)
-	rs.mutex.Unlock()
+func (r *registry) add(service Service) error {
+	r.mutex.Lock()
+	r.services = append(r.services, service)
+	r.mutex.Unlock()
 
-	return rs.sendRequiredServices(registrar)
+	err := r.sendRequiredServices(service)
+	r.notify(patch{
+		Added: []patchEntry{
+			patchEntry{
+				Name: service.Name,
+				URL:  service.URL,
+			},
+		},
+	})
+
+	return err
 }
 
-func (rs *registry) remove(url string) error {
-	for i, r := range rs.registrars {
-		if r.URL == url {
-			rs.mutex.Lock()
-			rs.registrars = append(rs.registrars[:i], rs.registrars[:i+1]...)
-			rs.mutex.Unlock()
+func (r *registry) remove(url string) error {
+	for i, service := range r.services {
+		if service.URL == url {
+			r.mutex.Lock()
+			r.services = append(r.services[:i], r.services[:i+1]...)
+			r.mutex.Unlock()
+			r.notify(patch{
+				Removed: []patchEntry{
+					{
+						Name: service.Name,
+						URL:  ServersURL,
+					},
+				},
+			})
 			return nil
 		}
 	}
@@ -34,27 +52,63 @@ func (rs *registry) remove(url string) error {
 	return fmt.Errorf("service at URL: %s not found", url)
 }
 
-func (rs *registry) sendRequiredServices(registrar Registrar) error {
-	rs.mutex.RLock()
-	defer rs.mutex.RUnlock()
+func (r *registry) notify(fullPatch patch) {
+	for _, svc := range r.services {
+		go func(s Service) {
+			for _, required := range s.RequiredServices {
+				p := patch{
+					Added: []patchEntry{},
+					Removed: []patchEntry{},
+				}
+				shouldUpdate := false
+
+				for _, entry := range fullPatch.Added {
+					if entry.Name == required {
+						p.Added = append(p.Added, entry)
+						shouldUpdate = true
+					}
+				}
+				for _, entry := range fullPatch.Removed {
+					if entry.Name == required {
+						p.Removed = append(p.Removed, entry)
+						shouldUpdate = true
+					}
+				}
+
+				if shouldUpdate {
+					err := r.sendPatch(p, s.UpdateURL)
+
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
+				}
+			}
+		}(svc)
+	}
+}
+
+func (r *registry) sendRequiredServices(service Service) error {
+	r.mutex.RLock()
+	defer r.mutex.RUnlock()
 
 	var p patch
 
-	for _, r := range rs.registrars {
-		for _, registered := range registrar.RequiredServices {
+	for _, r := range r.services {
+		for _, registered := range service.RequiredServices {
 			if registered == r.Name {
 				p.Added = append(p.Added, patchEntry{
 					Name: r.Name,
-					URL:  r.ServiceUpdateURL,
+					URL:  r.UpdateURL,
 				})
 			}
 		}
 	}
 
-	return rs.sendPatch(p, registrar.ServiceUpdateURL)
+	return r.sendPatch(p, service.UpdateURL)
 }
 
-func (rs *registry) sendPatch(p patch, url string) error {
+func (r *registry) sendPatch(p patch, url string) error {
 	data, err := json.Marshal(p)
 
 	if err != nil {

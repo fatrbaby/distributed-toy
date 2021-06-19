@@ -65,8 +65,8 @@ func (that *providers) get(name ServiceName) (string, error) {
 	return services[index], nil
 }
 
-func RegisterService(r Registrar) error {
-	updateURL, err := url.Parse(r.ServiceUpdateURL)
+func RegisterService(service Service) error {
+	updateURL, err := url.Parse(service.UpdateURL)
 
 	if err != nil {
 		return err
@@ -77,7 +77,7 @@ func RegisterService(r Registrar) error {
 	buff := new(bytes.Buffer)
 	encoder := json.NewEncoder(buff)
 
-	err = encoder.Encode(r)
+	err = encoder.Encode(service)
 
 	if err != nil {
 		return err
@@ -136,6 +136,8 @@ func (s serviceUpdateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	fmt.Printf("Updated received: %v\n", p)
 
 	prov.Update(p)
 }

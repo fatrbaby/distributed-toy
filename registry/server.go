@@ -14,19 +14,19 @@ const (
 )
 
 var center = registry{
-	registrars: make([]Registrar, 0),
-	mutex:      new(sync.RWMutex),
+	services: make([]Service, 0),
+	mutex:    new(sync.RWMutex),
 }
 
-type Service struct{}
+type Server struct{}
 
-func (s Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println("Request received")
 
 	switch r.Method {
 	case http.MethodPost:
 		decoder := json.NewDecoder(r.Body)
-		var registrar Registrar
+		var registrar Service
 		err := decoder.Decode(&registrar)
 
 		if err != nil {

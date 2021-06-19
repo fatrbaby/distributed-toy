@@ -1,10 +1,10 @@
 package registry
 
-type Registrar struct {
+type Service struct {
 	Name             ServiceName
 	URL              string
 	RequiredServices []ServiceName
-	ServiceUpdateURL string
+	UpdateURL        string
 }
 
 type ServiceName string
