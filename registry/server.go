@@ -21,7 +21,7 @@ var center = registry{
 
 var once sync.Once
 
-func SetupRegistry()  {
+func SetupRegistry() {
 	once.Do(func() {
 		go center.heartbeat(3 * time.Second)
 	})

@@ -71,7 +71,7 @@ func RegisterService(service Service) error {
 	if err != nil {
 		return err
 	}
-	
+
 	http.HandleFunc(heartbeatURL.Path, func(writer http.ResponseWriter, _ *http.Request) {
 		writer.WriteHeader(http.StatusOK)
 	})

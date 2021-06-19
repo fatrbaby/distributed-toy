@@ -91,7 +91,7 @@ func (r *registry) notify(fullPatch patch) {
 	}
 }
 
-func (r *registry)heartbeat(freq time.Duration)  {
+func (r *registry) heartbeat(freq time.Duration) {
 	for {
 		var wg sync.WaitGroup
 		for _, service := range r.services {
@@ -113,7 +113,7 @@ func (r *registry)heartbeat(freq time.Duration)  {
 							r.add(svc)
 						}
 
-						break;
+						break
 					}
 
 					log.Printf("Heartbeat check failed for: %v", svc.Name)
