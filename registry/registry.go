@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"sync"
+	"time"
 )
 
 type registry struct {
@@ -19,6 +21,7 @@ func (r *registry) add(service Service) error {
 	r.mutex.Unlock()
 
 	err := r.sendRequiredServices(service)
+
 	r.notify(patch{
 		Added: []patchEntry{
 			patchEntry{
@@ -44,7 +47,7 @@ func (r *registry) remove(url string) error {
 			})
 
 			r.mutex.Lock()
-			r.services = append(r.services[:i], r.services[:i+1]...)
+			r.services = append(r.services[:i], r.services[i+1:]...)
 			r.mutex.Unlock()
 			return nil
 		}
@@ -85,6 +88,48 @@ func (r *registry) notify(fullPatch patch) {
 				}
 			}
 		}(svc)
+	}
+}
+
+func (r *registry)heartbeat(freq time.Duration)  {
+	for {
+		var wg sync.WaitGroup
+		for _, service := range r.services {
+			wg.Add(1)
+			go func(svc Service) {
+				defer wg.Done()
+
+				success := true
+
+				for retries := 0; retries < 3; retries++ {
+					response, err := http.Get(svc.HeartbeatURL)
+
+					if err != nil {
+						log.Println(err)
+					} else if response.StatusCode == http.StatusOK {
+						log.Printf("Heartbeat check passed for: %v", svc.Name)
+
+						if !success {
+							r.add(svc)
+						}
+
+						break;
+					}
+
+					log.Printf("Heartbeat check failed for: %v", svc.Name)
+
+					if success {
+						success = false
+						r.remove(svc.URL)
+					}
+
+					time.Sleep(1 * time.Second)
+				}
+			}(service)
+
+			wg.Wait()
+			time.Sleep(freq)
+		}
 	}
 }
 

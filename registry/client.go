@@ -66,6 +66,16 @@ func (that *providers) get(name ServiceName) (string, error) {
 }
 
 func RegisterService(service Service) error {
+	heartbeatURL, err := url.Parse(service.HeartbeatURL)
+
+	if err != nil {
+		return err
+	}
+	
+	http.HandleFunc(heartbeatURL.Path, func(writer http.ResponseWriter, _ *http.Request) {
+		writer.WriteHeader(http.StatusOK)
+	})
+
 	updateURL, err := url.Parse(service.UpdateURL)
 
 	if err != nil {

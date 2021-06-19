@@ -9,9 +9,13 @@ import (
 )
 
 func main() {
+	registry.SetupRegistry()
+
 	http.Handle("/services", registry.Server{})
 
 	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	var srv http.Server
 	srv.Addr = registry.ServerPort
 

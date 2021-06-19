@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 )
 
 const (
@@ -16,6 +17,14 @@ const (
 var center = registry{
 	services: make([]Service, 0),
 	mutex:    new(sync.RWMutex),
+}
+
+var once sync.Once
+
+func SetupRegistry()  {
+	once.Do(func() {
+		go center.heartbeat(3 * time.Second)
+	})
 }
 
 type Server struct{}

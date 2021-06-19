@@ -5,6 +5,7 @@ type Service struct {
 	URL              string
 	RequiredServices []ServiceName
 	UpdateURL        string
+	HeartbeatURL string
 }
 
 type ServiceName string
