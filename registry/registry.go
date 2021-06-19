@@ -34,17 +34,18 @@ func (r *registry) add(service Service) error {
 func (r *registry) remove(url string) error {
 	for i, service := range r.services {
 		if service.URL == url {
-			r.mutex.Lock()
-			r.services = append(r.services[:i], r.services[:i+1]...)
-			r.mutex.Unlock()
 			r.notify(patch{
 				Removed: []patchEntry{
-					{
+					patchEntry{
 						Name: service.Name,
 						URL:  ServersURL,
 					},
 				},
 			})
+
+			r.mutex.Lock()
+			r.services = append(r.services[:i], r.services[:i+1]...)
+			r.mutex.Unlock()
 			return nil
 		}
 	}
@@ -56,10 +57,8 @@ func (r *registry) notify(fullPatch patch) {
 	for _, svc := range r.services {
 		go func(s Service) {
 			for _, required := range s.RequiredServices {
-				p := patch{
-					Added: []patchEntry{},
-					Removed: []patchEntry{},
-				}
+				p := newPatch()
+
 				shouldUpdate := false
 
 				for _, entry := range fullPatch.Added {
@@ -70,6 +69,7 @@ func (r *registry) notify(fullPatch patch) {
 				}
 				for _, entry := range fullPatch.Removed {
 					if entry.Name == required {
+						fmt.Printf("remove service: %v\n", required)
 						p.Removed = append(p.Removed, entry)
 						shouldUpdate = true
 					}

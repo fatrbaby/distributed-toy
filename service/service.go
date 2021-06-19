@@ -9,11 +9,11 @@ import (
 	"net/url"
 )
 
-func Start(ctx context.Context, registrar registry.Service, handlerRegistrar func()) (context.Context, error) {
+func Start(ctx context.Context, service registry.Service, handlerRegistrar func()) (context.Context, error) {
 	handlerRegistrar()
 
-	ctx = startServices(ctx, registrar)
-	err := registry.RegisterService(registrar)
+	ctx = startServices(ctx, service)
+	err := registry.RegisterService(service)
 
 	if err != nil {
 		return ctx, err
@@ -22,19 +22,19 @@ func Start(ctx context.Context, registrar registry.Service, handlerRegistrar fun
 	return ctx, nil
 }
 
-func startServices(ctx context.Context, registrar registry.Service) context.Context {
+func startServices(ctx context.Context, service registry.Service) context.Context {
 	ctx, cancel := context.WithCancel(ctx)
 
 	var srv http.Server
 
-	parts, _ := url.Parse(registrar.URL)
+	parts, _ := url.Parse(service.URL)
 
 	srv.Addr = ":" + parts.Port()
 
 	go func() {
 		log.Println(srv.ListenAndServe())
 
-		if err := registry.ShutdownService(registrar.URL); err != nil {
+		if err := registry.ShutdownService(service.URL); err != nil {
 			log.Println(err)
 		}
 
@@ -42,11 +42,11 @@ func startServices(ctx context.Context, registrar registry.Service) context.Cont
 	}()
 
 	go func() {
-		fmt.Printf("%v started. Press any key to stop. \n", registrar.Name)
+		fmt.Printf("%v started. Press any key to stop. \n", service.Name)
 		var s string
 		fmt.Scanln(&s)
 
-		if err := registry.ShutdownService(registrar.URL); err != nil {
+		if err := registry.ShutdownService(service.URL); err != nil {
 			log.Println(err)
 		}
 

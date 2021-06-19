@@ -1,4 +1,4 @@
-package logger
+package logging
 
 import (
 	"io/ioutil"
@@ -29,7 +29,7 @@ func Run(destination string) {
 }
 
 func RegisterHandlers() {
-	http.HandleFunc("/log", func(writer http.ResponseWriter, request *http.Request) {
+	http.HandleFunc("/logging", func(writer http.ResponseWriter, request *http.Request) {
 		switch request.Method {
 		case http.MethodPost:
 			msg, err := ioutil.ReadAll(request.Body)

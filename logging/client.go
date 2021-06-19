@@ -1,4 +1,4 @@
-package logger
+package logging
 
 import (
 	"bytes"
@@ -30,7 +30,7 @@ func (c clientLogger) Write(p []byte) (n int, err error) {
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return 0, fmt.Errorf("failed to send log message. service responed with status %v", response.StatusCode)
+		return 0, fmt.Errorf("failed to send logging message. service responed with status %v", response.StatusCode)
 	}
 
 	return len(p), nil

@@ -5,4 +5,5 @@ A toy model of distributed system
 ## Features:
 
 - [x] Service Registration
-- [ ] Service Discovery
+- [x] Service Discovery
+- [ ] Service Monitor
