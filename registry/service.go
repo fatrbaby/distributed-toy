@@ -21,7 +21,7 @@ type patch struct {
 
 func newPatch() patch {
 	return patch{
-		Added: []patchEntry{},
+		Added:   []patchEntry{},
 		Removed: []patchEntry{},
 	}
 }
